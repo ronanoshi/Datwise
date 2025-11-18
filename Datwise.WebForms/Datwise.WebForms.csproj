@@ -2,8 +2,13 @@
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
     <AspNetMvcVersion>5.2.7</AspNetMvcVersion>
+    <Nullable>enable</Nullable>
+    <LangVersion>8.0</LangVersion>
     <RootNamespace>Datwise.WebForms</RootNamespace>
   </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System.Web" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Datwise.Contracts\Datwise.Contracts.csproj" />
   </ItemGroup>
