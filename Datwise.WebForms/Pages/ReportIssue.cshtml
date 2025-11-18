@@ -1,0 +1,103 @@
+@page "/ReportIssue"
+@using Datwise.WebForms.Models
+@using Datwise.WebForms.Pages
+@model ReportIssueModel
+
+<div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+        <div class="modal-header bg-danger text-white">
+            <h5 class="modal-title">Report Security/Safety Issue</h5>
+            <a href="/" class="btn-close btn-close-white"></a>
+        </div>
+        <div class="modal-body">
+            <form id="reportForm" method="post">
+                <div class="mb-3">
+                    <label for="title" class="form-label">Issue Title *</label>
+                    <input type="text" class="form-control @(!string.IsNullOrEmpty(Model?.TitleError) ? "is-invalid" : "")" 
+                           id="title" name="title" placeholder="Brief description of the issue" required maxlength="255">
+                    @if (!string.IsNullOrEmpty(Model?.TitleError))
+                    {
+                        <div class="invalid-feedback">@Model.TitleError</div>
+                    }
+                </div>
+
+                <div class="mb-3">
+                    <label for="description" class="form-label">Detailed Description *</label>
+                    <textarea class="form-control @(!string.IsNullOrEmpty(Model?.DescriptionError) ? "is-invalid" : "")" 
+                              id="description" name="description" rows="5" placeholder="Provide detailed information about the issue" 
+                              required maxlength="2000"></textarea>
+                    @if (!string.IsNullOrEmpty(Model?.DescriptionError))
+                    {
+                        <div class="invalid-feedback">@Model.DescriptionError</div>
+                    }
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="severity" class="form-label">Severity Level *</label>
+                        <select class="form-select @(!string.IsNullOrEmpty(Model?.SeverityError) ? "is-invalid" : "")" 
+                                id="severity" name="severity" required>
+                            <option value="">Select severity...</option>
+                            <option value="Low">Low - Minor inconvenience</option>
+                            <option value="Medium">Medium - Should be addressed soon</option>
+                            <option value="High">High - Urgent attention needed</option>
+                            <option value="Critical">Critical - Immediate action required</option>
+                        </select>
+                        @if (!string.IsNullOrEmpty(Model?.SeverityError))
+                        {
+                            <div class="invalid-feedback">@Model.SeverityError</div>
+                        }
+                    </div>
+                    <div class="col-md-6">
+                        <label for="department" class="form-label">Department *</label>
+                        <input type="text" class="form-control @(!string.IsNullOrEmpty(Model?.DepartmentError) ? "is-invalid" : "")" 
+                               id="department" name="department" placeholder="e.g., Operations, Facilities" required maxlength="100">
+                        @if (!string.IsNullOrEmpty(Model?.DepartmentError))
+                        {
+                            <div class="invalid-feedback">@Model.DepartmentError</div>
+                        }
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="location" class="form-label">Location *</label>
+                        <input type="text" class="form-control @(!string.IsNullOrEmpty(Model?.LocationError) ? "is-invalid" : "")" 
+                               id="location" name="location" placeholder="e.g., Building A - Floor 2" required maxlength="255">
+                        @if (!string.IsNullOrEmpty(Model?.LocationError))
+                        {
+                            <div class="invalid-feedback">@Model.LocationError</div>
+                        }
+                    </div>
+                    <div class="col-md-6">
+                        <label for="reportedBy" class="form-label">Your Name *</label>
+                        <input type="text" class="form-control @(!string.IsNullOrEmpty(Model?.ReportedByError) ? "is-invalid" : "")" 
+                               id="reportedBy" name="reportedBy" placeholder="Your name" required maxlength="255">
+                        @if (!string.IsNullOrEmpty(Model?.ReportedByError))
+                        {
+                            <div class="invalid-feedback">@Model.ReportedByError</div>
+                        }
+                    </div>
+                </div>
+
+                @if (!string.IsNullOrEmpty(Model?.GeneralError))
+                {
+                    <div class="alert alert-danger" role="alert">
+                        @Model.GeneralError
+                    </div>
+                }
+
+                @if (!string.IsNullOrEmpty(Model?.SuccessMessage))
+                {
+                    <div class="alert alert-success" role="alert">
+                        @Model.SuccessMessage
+                    </div>
+                }
+            </form>
+        </div>
+        <div class="modal-footer">
+            <a href="/" class="btn btn-secondary">Cancel</a>
+            <button type="submit" form="reportForm" class="btn btn-danger">Submit Report</button>
+        </div>
+    </div>
+</div>

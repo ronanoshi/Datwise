@@ -1,53 +1,99 @@
-# Datwise
+# Datwise - Security & Safety Control Panel
 
-Datwise is an example ASP.NET WebForms + Web API solution scaffold. This workspace is a starter skeleton to help you build a traditional WebForms site that calls a REST API for server-side operations.
+Datwise is a comprehensive security and safety incident management system built with modern ASP.NET Core. It features a Razor Pages web UI, a REST API, and SQLite database integration.
 
 ## Projects
-- Datwise.WebForms - Classic ASP.NET WebForms app (targeting .NET Framework 4.8). Contains UI pages and client-side logic that consumes the Web API.
-- Datwise.Api - Web API (Web API 2) providing REST endpoints consumed by WebForms.
-- Datwise.Services - Core application services.
-- Datwise.Contracts - DTOs and API contracts.
-- Datwise.Models - Domain models and entities.
-- Datwise.Data - Data access abstractions and repositories (in-memory stub by default).
-- Datwise.Tests - Unit test stubs.
+- **Datwise.WebForms** - Razor Pages web application (ASP.NET Core 9.0) with Control Panel UI
+- **Datwise.Api** - REST API (ASP.NET Core 9.0) providing incident management endpoints
+- **Datwise.Services** - Business logic (Multi-target: .NET Standard 2.0, .NET 4.8, .NET 9.0)
+- **Datwise.Contracts** - Service interfaces and DTOs (.NET Standard 2.0)
+- **Datwise.Models** - Domain models and entities (.NET Standard 2.0)
+- **Datwise.Data** - Entity Framework Core data access layer (ASP.NET Core 9.0)
+- **Datwise.Tests** - Unit tests (xUnit, .NET 9.0)
 
-> NOTE: Because classic ASP.NET WebForms and Web API 2 target .NET Framework (4.8), open this project with Visual Studio (Professional/Community) for full feature support (designer, WebForms scaffolding, Publish tools).
+## Features
 
-## How to use
-1. Open `Datwise` folder in Visual Studio (recommended for WebForms and Web API 2). You may need to manually add projects to the solution (or use Visual Studio's "Add Existing Project" to import the `.csproj` files we created here).
-2. Restore NuGet packages and build the solution.
-	- If you prefer to use the .NET CLI for the API and shared libraries: run `dotnet restore` and `dotnet build` from the root folder.
-	- Create a solution and add the projects if you want a single Visual Studio solution, e.g.:
+### Control Panel (WebForms)
+- Dashboard with incident statistics
+- Table of open incidents sorted by severity and date
+- Report Issue form for new incident submissions
+- Form validation and error handling
+- Responsive Bootstrap 5 UI
 
-```powershell
-cd C:\Users\ronan\workspace\Datwise
-dotnet new sln -n Datwise
-dotnet sln add Datwise.Contracts\Datwise.Contracts.csproj
-dotnet sln add Datwise.Models\Datwise.Models.csproj
-dotnet sln add Datwise.Services\Datwise.Services.csproj
-dotnet sln add Datwise.Data\Datwise.Data.csproj
-dotnet sln add Datwise.Api\Datwise.Api.csproj
-dotnet sln add Datwise.WebForms\Datwise.WebForms.csproj
-dotnet sln add Datwise.Tests\Datwise.Tests.csproj
-dotnet restore
-dotnet build
-```
-3. Start `Datwise.Api` (IIS Express) and `Datwise.WebForms` (IIS Express) in Visual Studio.
+### API Endpoints
+- `GET /api/errors/open` - Get all open incidents
+- `GET /api/errors/severity/{severity}` - Get incidents by severity
+- `GET /api/errors/{id}` - Get incident by ID
+- `GET /api/errors/statistics/summary` - Get statistics
+- `POST /api/errors` - Create new incident report
+- `PUT /api/errors/{id}` - Update incident
+- `DELETE /api/errors/{id}` - Delete incident
+- Swagger/OpenAPI documentation at `/swagger`
 
-### Using the API with the dotnet CLI
+## Database
+- **Type**: SQLite
+- **File**: `datwise.db`
+- **Initialization**: Automatic on first API run
+- **Tables**: Errors table with incident data
 
-1. From an elevated PowerShell terminal or normal terminal where dotnet is available:
+## How to Use
 
-```powershell
-cd C:\Users\ronan\workspace\Datwise\Datwise.Api
+### Quick Start
+1. Clone the repository
+2. Run from the solution root:
+   ```bash
+   dotnet restore
+   dotnet build
+   ```
+
+### Running the Application
+
+**Start the API:**
+```bash
+cd Datwise.Api
 dotnet run
 ```
+API available at: `https://localhost:7194` or `http://localhost:5281`
 
-2. By default ASP.NET Core will start on a Kestrel listening port (e.g. http://localhost:5000). Update the WebForms `Default.aspx.cs` `CallApi` URL if needed.
+**Start the WebForms (in a new terminal):**
+```bash
+cd Datwise.WebForms
+dotnet run
+```
+WebForms available at: `https://localhost:7290` or `http://localhost:5281`
 
-## Next steps
-- Replace stub services and repository with full implementations.
-- Add logging, configuration (appsettings or web.config), and dependency injection.
-- Add authentication/authorization for API access.
+### Visual Studio
+1. Open the solution
+2. Set **Datwise.Api** as startup project
+3. Press F5 to run the API
+4. Open a new terminal and run WebForms as shown above
 
-If you'd like, I can continue by adding working csproj files, Visual Studio solution structure, or automatic CI steps. Tell me which you'd prefer.
+## Configuration
+
+**API** (`Datwise.Api/appsettings.json`):
+- ConnectionString: SQLite database path
+
+**WebForms** (`Datwise.WebForms/appsettings.json`):
+- ApiBaseUrl: URL where API is running
+
+## Database Setup
+The database is automatically created and initialized on the first API run. The schema includes:
+- Errors table with proper indexes
+- Support for incident severity levels (Low, Medium, High, Critical)
+- Support for incident status tracking (Open, In Progress, Resolved, Closed)
+
+## Development
+- Built with ASP.NET Core 9.0
+- Entity Framework Core for data access
+- Bootstrap 5 for UI
+- RESTful API design
+- Multi-target .NET support for shared libraries
+
+## Deployment
+The SQLite database makes this easy to deploy:
+1. Build and publish both projects
+2. Ensure both have access to the same directory for `datwise.db`
+3. Configure connection strings and API URLs as needed
+4. Run both services
+
+For more details, see the individual project README files or documentation.
