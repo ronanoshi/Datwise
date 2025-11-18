@@ -2,376 +2,261 @@
 
 ![.NET 9](https://img.shields.io/badge/.NET-9.0-512BD4?logo=.net)
 ![License](https://img.shields.io/badge/license-MIT-green)
-![Status](https://img.shields.io/badge/status-Active%20Development-brightgreen)
+![Status](https://img.shields.io/badge/status-Production%20Ready-brightgreen)
 
-A modern, professional Security & Safety Control Panel application built with ASP.NET Core, Razor Pages, and a RESTful API. Manage and track security and safety incidents with an intuitive dashboard, real-time statistics, and powerful filtering and sorting capabilities.
+A professional Security & Safety Control Panel application built with ASP.NET Core Razor Pages and a RESTful API. Manage and track security and safety incidents with an intuitive dashboard, real-time statistics, and powerful filtering and sorting capabilities.
 
-## ?? Features
+## ? Key Features
 
-### Dashboard
+### Dashboard & UI
 - **Real-time Statistics** - Total open issues, critical/high severity counts, monthly resolutions
-- **Professional UI** - Modern, responsive design with smooth animations
-- **Dark Mode** - Toggle between light and dark themes with persistent settings
-- **Full-Screen Optimized** - Fits perfectly in viewport without scrolling
+- **Professional Design** - Modern, responsive UI with smooth animations
+- **Dark/Light Mode** - Toggle theme with persistent user preference
+- **Full-Screen Optimized** - Perfect fit within viewport, no scrolling needed
+- **Column Sorting** - Click any table header to sort ascending/descending
+- **Multi-Filter Support** - Comma-separated status/severity filtering (e.g., `status=Open,In Progress`)
 
 ### Data Management
-- **Issue Tracking** - Create, read, update, and delete security/safety issues
-- **Advanced Filtering** - Filter by status, severity, department, location, and more
-- **Multi-Column Sorting** - Click any column header to sort ascending/descending
-- **Smart Statistics** - Automatic calculation of issue metrics and trends
+- **Issue Tracking** - Create, read, update, and delete security/safety incidents
+- **Advanced Filtering** - Status, severity, department, location filters with "contains" logic
+- **Smart Statistics** - Automatic calculation of metrics and trends
+- **SQLite Database** - Lightweight, file-based, auto-initialized on startup
 
-### Technical Features
-- **RESTful API** - Complete REST API with filtering, sorting, and pagination support
-- **SQLite Database** - Lightweight, file-based database with automatic initialization
-- **Clean Architecture** - 3-tier architecture with separation of concerns
-- **Comprehensive Testing** - Unit tests for repositories and services
-- **Dark/Light Mode** - CSS variable-based theming system
+### Technical Architecture
+- **3-Tier Architecture** - Clean separation: UI ? API ? Data
+- **RESTful API** - Complete REST endpoints with OpenAPI/Swagger documentation
+- **Entity Framework Core** - ORM with migrations and automatic database creation
+- **Comprehensive Tests** - 24 unit tests covering repositories and services
+- **Async/Await Throughout** - All I/O operations are non-blocking
 
 ## ?? Quick Start
 
 ### Prerequisites
-- **.NET 9 SDK** - [Download](https://dotnet.microsoft.com/download/dotnet/9.0)
-- **Visual Studio 2022** or **Visual Studio Code**
-- **Git**
+- .NET 9 SDK
+- Visual Studio 2022 or VS Code
 
-### Installation
+### Setup (5 minutes)
 
-1. **Clone the Repository**
+1. **Clone & Navigate**
 ```bash
 git clone https://github.com/ronanoshi/Datwise.git
 cd Datwise
 ```
 
-2. **Clean Up Ports** (if previously run)
-```powershell
-.\cleanup-ports.ps1
-```
-
-3. **Start the API** (Terminal 1)
+2. **Start API** (Terminal 1)
 ```bash
 cd Datwise.Api
 dotnet run
-```
-Expected output:
-```
-? Database created/verified successfully
-? Test data seeded successfully
-Now listening on: https://localhost:53486
+# Listens on: http://localhost:53487 (dev) or https://localhost:53486
 ```
 
-4. **Start WebForms** (Terminal 2)
+3. **Start WebForms** (Terminal 2)
 ```bash
 cd Datwise.WebForms
 dotnet run
+# Listens on: http://localhost:53488 (dev) or https://localhost:53485
 ```
 
-5. **Open in Browser**
+4. **Open Browser**
 ```
-https://localhost:53485
+http://localhost:53488
 ```
+
+## ?? API Endpoints
+
+### Base URL
+`http://localhost:53487` (development) or `https://localhost:53486` (production)
+
+### Main Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/issues` | Get all issues with optional filtering & sorting |
+| GET | `/api/issues/open` | Get open and in-progress issues |
+| GET | `/api/issues/severity/{severity}` | Get issues by severity |
+| GET | `/api/issues/{id}` | Get issue by ID |
+| GET | `/api/issues/statistics/summary` | Get dashboard statistics |
+| POST | `/api/issues` | Create new issue |
+| PUT | `/api/issues/{id}` | Update issue |
+| DELETE | `/api/issues/{id}` | Delete issue |
+
+### Query Parameters
+
+**Status Filter** (comma-separated)
+```
+GET /api/issues?status=Open,In Progress
+GET /api/issues?status=Open,In Progress,Resolved
+```
+
+**Severity Filter** (comma-separated)
+```
+GET /api/issues?severity=High,Critical
+GET /api/issues?severity=Low,Medium,High,Critical
+```
+
+**Combined with Sorting**
+```
+GET /api/issues?status=Open,In Progress&severity=High,Critical&sort=-date
+GET /api/issues?status=Open&sort=title
+```
+
+**Valid Sort Fields**: `id`, `title`, `severity`, `status`, `department`, `location`, `reportedby`, `date`
+Use `-` prefix for descending: `sort=-date`
+
+## ??? Architecture
+
+### Project Structure
+```
+Datwise/
+??? Datwise.Api/              # REST API (ASP.NET Core Web API)
+??? Datwise.WebForms/         # UI (Razor Pages)
+??? Datwise.Services/         # Business logic (.NET Standard 2.0)
+??? Datwise.Data/             # Data access (EF Core)
+??? Datwise.Contracts/        # Interfaces & DTOs
+??? Datwise.Models/           # Domain models
+??? Datwise.Tests/            # Unit tests (xUnit + Moq)
+```
+
+### Data Flow
+```
+User Form (Razor Pages)
+    ?
+ReportIssueModel (HTTP POST)
+    ?
+IssuesController (REST API)
+    ?
+IssueService (Business Logic)
+    ?
+IssueRepository (EF Core)
+    ?
+SQLite Database
+```
+
+## ?? UI/UX Features
+
+### Dark/Light Mode
+- Located in navbar toggle switch
+- Persisted in browser localStorage
+- Smooth CSS variable transitions
+- Works across all pages
+
+### Table Sorting
+- Click column headers to sort
+- Visual indicators (? ?) show direction
+- URL persists sort state: `/?sort=-date`
+- Supports all issue fields
+
+### Statistics Dashboard
+- Real-time metrics cards
+- Color-coded severity indicators
+- Open issues count (Open + In Progress)
+- Critical/High/Medium/Low breakdowns
+- Monthly resolution tracking
+
+## ?? Testing
+
+### Run All Tests
+```bash
+dotnet test Datwise.Tests
+```
+
+### Test Coverage
+- **24 total tests** - All passing
+- **8 repository tests** - CRUD, filtering, sorting
+- **13 service tests** - Business logic, validation
+- **3 multi-filter tests** - Complex filtering scenarios
+
+### Test Framework
+- **xUnit** - Modern test framework
+- **Moq** - Mocking library for dependencies
+- **In-Memory Database** - Isolated test data
 
 ## ?? Sample Data
 
-The application comes pre-populated with 5 security/safety issues:
+Application comes pre-seeded with 5 issues:
 
-| Title | Severity | Status | Department |
-|-------|----------|--------|------------|
+| Issue | Severity | Status | Department |
+|-------|----------|--------|-----------|
 | Fire Extinguisher Missing | High | Open | Facilities |
 | Wet Floor Hazard | Medium | Open | Operations |
 | Equipment Malfunction | Critical | In Progress | Maintenance |
 | First Aid Kit Empty | Low | Open | Facilities |
 | Broken Handrail | High | Open | Maintenance |
 
-## ?? API Endpoints
-
-### Base URL
-```
-https://localhost:53486/api/issues
-```
-
-### Endpoints
-
-#### Get Issues with Filtering and Sorting
-```http
-GET /api/issues?status=Open&severity=High&sort=-date
-```
-
-**Query Parameters:**
-- `status` - Filter by status (Open, In Progress, Resolved)
-- `severity` - Filter by severity (Low, Medium, High, Critical)
-- `sort` - Sort field with optional `-` prefix for descending
-  - Valid fields: `id`, `title`, `severity`, `status`, `department`, `location`, `reportedby`, `date`
-  - Examples: `sort=title`, `sort=-date`, `sort=severity`
-
-#### Get Open Issues
-```http
-GET /api/issues/open?sort=-reporteddate
-```
-
-#### Get Issues by Severity
-```http
-GET /api/issues/severity/Critical
-```
-
-#### Get Issue by ID
-```http
-GET /api/issues/1
-```
-
-#### Get Statistics
-```http
-GET /api/issues/statistics/summary
-```
-
-#### Create Issue
-```http
-POST /api/issues
-Content-Type: application/json
-
-{
-  "title": "Safety Concern",
-  "description": "Detailed description",
-  "severity": "High",
-  "status": "Open",
-  "reportedBy": "John Doe",
-  "department": "Facilities",
-  "location": "Building A"
-}
-```
-
-#### Update Issue
-```http
-PUT /api/issues/1
-Content-Type: application/json
-
-{
-  "id": 1,
-  "title": "Updated Title",
-  "description": "Updated description",
-  "severity": "Critical",
-  "status": "In Progress",
-  "reportedBy": "Jane Doe",
-  "department": "Facilities",
-  "location": "Building A"
-}
-```
-
-#### Delete Issue
-```http
-DELETE /api/issues/1
-```
-
-## ?? UI Features
-
-### Dashboard
-- **Statistics Cards** - Quick overview of key metrics with color coding
-- **Sortable Table** - Click column headers to sort data
-- **Visual Indicators** - ? for ascending, ? for descending sort
-- **Empty States** - Friendly messaging when no data exists
-- **Responsive Design** - Works on desktop, tablet, and mobile
-
-### Themes
-- **Light Mode** - Clean white interface for daytime use
-- **Dark Mode** - Easy on the eyes for extended use
-
-### Accessibility
-- Keyboard navigable table sorting
-- Color-coded severity and status badges
-- ARIA labels for accessibility
-- Semantic HTML structure
-
-## ?? Project Structure
-
-```
-Datwise/
-??? Datwise.Api/                    # ASP.NET Core Web API
-?   ??? Controllers/
-?   ?   ??? IssuesController.cs    # REST API endpoints
-?   ??? Program.cs                 # Configuration
-?   ??? appsettings.json           # Settings
-?   ??? datwise-dev.db             # SQLite database
-?
-??? Datwise.WebForms/              # Razor Pages UI
-?   ??? Pages/
-?   ?   ??? Index.cshtml           # Dashboard
-?   ?   ??? ReportIssue.cshtml     # Report form
-?   ?   ??? Shared/
-?   ?       ??? _Layout.cshtml     # Master layout
-?   ??? Models/
-?   ?   ??? ControlPanelViewModel.cs
-?   ?   ??? IssueViewModel.cs
-?   ?   ??? IssueStatisticsViewModel.cs
-?   ??? wwwroot/
-?   ?   ??? css/
-?   ?   ?   ??? site.css           # Theme and styles
-?   ?   ??? js/
-?   ?       ??? theme-toggle.js    # Dark/light mode
-?   ?       ??? table-sorting.js   # Column sorting
-?   ??? Program.cs                 # Configuration
-?
-??? Datwise.Services/              # Business Logic
-?   ??? IIssueService.cs           # Service interface
-?   ??? IssueService.cs            # Service implementation
-?
-??? Datwise.Data/                  # Data Access Layer
-?   ??? DatwiseDbContext.cs        # EF Core DbContext
-?   ??? IssueRepository.cs         # Data repository
-?   ??? DatabaseSeeder.cs          # Test data seeding
-?   ??? initialize-database.sql    # Database schema
-?
-??? Datwise.Contracts/             # Interfaces & DTOs
-?   ??? IIssueRepository.cs        # Repository interface
-?   ??? IssueStatistics.cs         # Statistics DTO
-?
-??? Datwise.Models/                # Domain Models
-?   ??? Issue.cs                   # Issue entity
-?
-??? Datwise.Tests/                 # Unit Tests
-?   ??? IssueRepositoryTests.cs
-?   ??? IssueServiceTests.cs
-?
-??? Documentation/
-    ??? README.md                  # This file
-    ??? QUICKSTART.md              # Getting started guide
-    ??? DATABASE_INITIALIZATION.md # Database setup details
-```
-
-## ??? Architecture
-
-```
-???????????????????????????????????????????
-?     WebForms UI (Razor Pages)           ?
-?  https://localhost:53485                ?
-?  - Dashboard Display                    ?
-?  - Report Issue Form                    ?
-???????????????????????????????????????????
-               ? HTTP Client (JSON)
-               ?
-????????????????????????????????????????????
-?  REST API (ASP.NET Core)                 ?
-?  https://localhost:53486                 ?
-?  - IssuesController                      ?
-?  - Filtering & Sorting                   ?
-????????????????????????????????????????????
-               ? EF Core
-               ?
-????????????????????????????????????????????
-?  Business Logic Layer                    ?
-?  - IssueService                          ?
-?  - Validation & Processing               ?
-????????????????????????????????????????????
-               ? EF Core
-               ?
-????????????????????????????????????????????
-?  Data Access Layer                       ?
-?  - IssueRepository                       ?
-?  - Query Building                        ?
-????????????????????????????????????????????
-               ? SQLite Driver
-               ?
-????????????????????????????????????????????
-?  SQLite Database                         ?
-?  datwise-dev.db                          ?
-????????????????????????????????????????????
-```
-
 ## ?? Configuration
 
-### Ports
-| Service | HTTPS | HTTP |
-|---------|-------|------|
-| API | 53486 | 53487 |
-| WebForms | 53485 | 53488 |
-
 ### Database
-- **Type:** SQLite
-- **File:** `Datwise.Api/datwise-dev.db`
-- **Auto-Created:** Yes, on first API startup
+- **Type**: SQLite
+- **File**: `Datwise.Api/datwise-dev.db`
+- **Auto-Initialize**: Yes, on API startup
+- **Schema**: `datwise-dev.db` created with Issues table
 
-### Connection String
-```
-Data Source=datwise-dev.db
-```
-
-## ?? Testing
-
-### Run Tests
-```bash
-dotnet test Datwise.Tests
+### API Configuration
+```json
+// appsettings.Development.json
+{
+  "ApiBaseUrl": "https://localhost:53486"
+}
 ```
 
-### Test Coverage
-- **Repository Tests** - 8 tests covering CRUD, filtering, sorting
-- **Service Tests** - 13 tests covering business logic and validation
-- **API Tests** - Full endpoint coverage
-
-### Running Tests
-```bash
-# Run all tests
-dotnet test
-
-# Run with verbose output
-dotnet test --verbosity=detailed
-
-# Run specific test class
-dotnet test --filter ClassName=IssueRepositoryTests
+### WebForms Configuration
+```json
+// appsettings.Development.json
+{
+  "ApiBaseUrl": "https://localhost:53486"
+}
 ```
+*Note: Automatically converts to HTTP (localhost:53487) in development*
 
-## ?? Security Considerations
+## ?? Security & Performance
 
-- Input validation on all endpoints
+### Security
+- Input validation on all fields
 - SQL injection protection via EF Core
-- HTTPS enforced in production
-- No sensitive data in logs
-- Proper error handling without exposing internals
+- HTTPS in production
+- Proper error handling
 
-## ?? Performance
+### Performance
+- Database indexes on Status, Severity, ReportedDate
+- Async/await for all I/O
+- EF Core query optimization
+- Lazy loading disabled to prevent N+1 queries
 
-- **Database Indexes** - On Status, Severity, and ReportedDate
-- **Async/Await** - All database operations are async
-- **Efficient Queries** - EF Core query optimization
-- **Lazy Loading** - Disabled to prevent N+1 queries
+## ?? Development Workflow
 
-## ?? Contributing
+### Adding a New Issue Type
+1. Create DTO in `Datwise.Contracts`
+2. Add repository method in `Datwise.Data`
+3. Add service method in `Datwise.Services`
+4. Expose via `IssuesController` endpoint
+5. Add unit tests in `Datwise.Tests`
+6. Update UI in `Datwise.WebForms`
 
-Contributions are welcome! Please:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit changes (`git commit -m 'Add amazing feature'`)
-4. Push to branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## ?? License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
+### Modifying API Behavior
+1. Update `IIssueService` interface
+2. Implement in `IssueService`
+3. Update `IIssueRepository` if needed
+4. Update controller endpoint
+5. Add/update tests
 
 ## ?? Deployment
 
-### Production Checklist
-- [ ] Update database connection string for production
-- [ ] Configure HTTPS certificates
-- [ ] Enable CORS if needed
-- [ ] Set up logging and monitoring
-- [ ] Configure database backups
-- [ ] Review and update security policies
-- [ ] Performance testing and optimization
+### Development
+```bash
+dotnet run              # Uses launchSettings.json
+http://localhost:53488  # WebForms
+http://localhost:53487  # API
+```
 
-### Docker Support (Coming Soon)
-- Containerized API
-- Containerized WebForms
-- Docker Compose orchestration
+### Production
+- Set `ASPNETCORE_ENVIRONMENT=Production`
+- Configure valid HTTPS certificates
+- Use production database (SQL Server recommended)
+- Update `ApiBaseUrl` in appsettings
+- Enable CORS if needed
+- Configure logging and monitoring
 
-## ?? Additional Resources
-
-- [QUICKSTART.md](./QUICKSTART.md) - 5-minute getting started guide
-- [DATABASE_INITIALIZATION.md](./DATABASE_INITIALIZATION.md) - Database setup details
-- [API Documentation](https://localhost:53486/swagger) - Swagger UI
-- [.NET 9 Documentation](https://learn.microsoft.com/dotnet/fundamentals/)
-- [Entity Framework Core](https://learn.microsoft.com/ef/core/)
-- [Razor Pages](https://learn.microsoft.com/aspnet/core/razor-pages/)
-
-## ?? Troubleshooting
+## ??? Troubleshooting
 
 ### Port Already in Use
 ```powershell
@@ -379,34 +264,73 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ```
 
 ### Database Not Creating
-1. Delete existing `datwise-dev.db` file
-2. Restart the API
+1. Delete `Datwise.Api/datwise-dev.db`
+2. Restart API
 3. Check console for initialization messages
 
-### API Not Responding
-1. Verify API is running on port 53486
-2. Check firewall settings
-3. Review console output for errors
+### SSL Certificate Issues (Development)
+- API automatically uses HTTP for localhost in dev
+- WebForms converts HTTPS to HTTP automatically
+- Use `http://localhost:53488` in browser
 
-### WebForms Can't Connect to API
-1. Ensure API is running first
-2. Check `appsettings.json` for correct `ApiBaseUrl`
-3. Verify network connectivity
+### Form Submission Fails
+1. Verify API is running on port 53487
+2. Check appsettings.json ApiBaseUrl
+3. Review console logs for HTTP errors
+4. Test API with cURL: `curl http://localhost:53487/api/issues`
+
+## ?? Code Examples
+
+### Get Open Issues with Sorting
+```csharp
+// In ReportIssueModel or any page
+var response = await _httpClient.GetAsync(
+    "http://localhost:53487/api/issues/open?sort=-date");
+var issues = JsonSerializer.Deserialize<List<IssueViewModel>>(
+    await response.Content.ReadAsStringAsync());
+```
+
+### Create New Issue
+```json
+POST http://localhost:53487/api/issues
+Content-Type: application/json
+
+{
+  "title": "Safety Concern",
+  "description": "Issue details",
+  "severity": "High",
+  "status": "Open",
+  "reportedBy": "John Doe",
+  "department": "Operations",
+  "location": "Building A"
+}
+```
+
+### Filter Multiple Statuses
+```bash
+curl "http://localhost:53487/api/issues?status=Open,In%20Progress&severity=High,Critical"
+```
 
 ## ?? Support
 
-For issues and questions:
-1. Check [QUICKSTART.md](./QUICKSTART.md)
-2. Review console output for error messages
-3. Check database file permissions
-4. Verify ports are available
+For issues:
+1. Check console output for detailed error messages
+2. Verify API and WebForms are both running
+3. Ensure database file exists: `Datwise.Api/datwise-dev.db`
+4. Review test files for usage examples
 
-## ?? Changelog
+## ?? License
 
-See [CHANGELOG.md](./CHANGELOG.md) for version history and changes.
+MIT License - See LICENSE file for details
 
 ---
 
-**Made with ?? for security and safety professionals**
+**Technology Stack**
+- .NET 9 (API, WebForms)
+- .NET Standard 2.0 (Services, Contracts)
+- Entity Framework Core
+- SQLite
+- Bootstrap 5
+- xUnit & Moq
 
-Last Updated: 2024
+**Status**: ? Production Ready | **Tests**: ? 24/24 Passing | **Build**: ? Successful
