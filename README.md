@@ -26,7 +26,7 @@ A professional Security & Safety Control Panel application built with ASP.NET Co
 - **3-Tier Architecture** - Clean separation: UI ? API ? Data
 - **RESTful API** - Complete REST endpoints with OpenAPI/Swagger documentation
 - **Entity Framework Core** - ORM with migrations and automatic database creation
-- **Comprehensive Tests** - 24 unit tests covering repositories and services
+- **Comprehensive Tests** - 35 unit tests covering repositories and services
 - **Async/Await Throughout** - All I/O operations are non-blocking
 
 ## ?? Quick Start
@@ -72,8 +72,6 @@ http://localhost:53488
 | Method | Endpoint | Description |
 |--------|----------|-------------|
 | GET | `/api/issues` | Get all issues with optional filtering & sorting |
-| GET | `/api/issues/open` | Get open and in-progress issues |
-| GET | `/api/issues/severity/{severity}` | Get issues by severity |
 | GET | `/api/issues/{id}` | Get issue by ID |
 | GET | `/api/issues/statistics/summary` | Get dashboard statistics |
 | POST | `/api/issues` | Create new issue |
@@ -161,10 +159,9 @@ dotnet test Datwise.Tests
 ```
 
 ### Test Coverage
-- **24 total tests** - All passing
-- **8 repository tests** - CRUD, filtering, sorting
-- **13 service tests** - Business logic, validation
-- **3 multi-filter tests** - Complex filtering scenarios
+- **35 total tests** - All passing
+- **17 repository tests** - CRUD, filtering, sorting
+- **18 service tests** - Business logic, validation
 
 ### Test Framework
 - **xUnit** - Modern test framework
@@ -195,7 +192,7 @@ Application comes pre-seeded with 5 issues:
 ```json
 // appsettings.Development.json
 {
-  "ApiBaseUrl": "https://localhost:53486"
+  "ApiBaseUrl": "http://localhost:53487"
 }
 ```
 
@@ -203,10 +200,10 @@ Application comes pre-seeded with 5 issues:
 ```json
 // appsettings.Development.json
 {
-  "ApiBaseUrl": "https://localhost:53486"
+  "ApiBaseUrl": "http://localhost:53487"
 }
 ```
-*Note: Automatically converts to HTTP (localhost:53487) in development*
+*Note: Uses HTTP for development, HTTPS for production*
 
 ## ?? Security & Performance
 
@@ -222,9 +219,9 @@ Application comes pre-seeded with 5 issues:
 - EF Core query optimization
 - Lazy loading disabled to prevent N+1 queries
 
-## ?? Development Workflow
+## ??? Development Workflow
 
-### Adding a New Issue Type
+### Adding a New Feature
 1. Create DTO in `Datwise.Contracts`
 2. Add repository method in `Datwise.Data`
 3. Add service method in `Datwise.Services`
@@ -256,7 +253,7 @@ http://localhost:53487  # API
 - Enable CORS if needed
 - Configure logging and monitoring
 
-## ??? Troubleshooting
+## ?? Troubleshooting
 
 ### Port Already in Use
 ```powershell
@@ -270,7 +267,7 @@ http://localhost:53487  # API
 
 ### SSL Certificate Issues (Development)
 - API automatically uses HTTP for localhost in dev
-- WebForms converts HTTPS to HTTP automatically
+- WebForms uses HTTP in development
 - Use `http://localhost:53488` in browser
 
 ### Form Submission Fails
@@ -281,11 +278,10 @@ http://localhost:53487  # API
 
 ## ?? Code Examples
 
-### Get Open Issues with Sorting
+### Get Issues with Filtering
 ```csharp
-// In ReportIssueModel or any page
 var response = await _httpClient.GetAsync(
-    "http://localhost:53487/api/issues/open?sort=-date");
+    "http://localhost:53487/api/issues?status=Open,In Progress&sort=-date");
 var issues = JsonSerializer.Deserialize<List<IssueViewModel>>(
     await response.Content.ReadAsStringAsync());
 ```
@@ -333,4 +329,4 @@ MIT License - See LICENSE file for details
 - Bootstrap 5
 - xUnit & Moq
 
-**Status**: ? Production Ready | **Tests**: ? 24/24 Passing | **Build**: ? Successful
+**Status**: ? Production Ready | **Tests**: ? 35/35 Passing | **Build**: ? Successful
