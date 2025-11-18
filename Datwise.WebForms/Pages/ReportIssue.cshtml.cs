@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Threading.Tasks;
@@ -15,6 +14,7 @@ namespace Datwise.WebForms.Pages
     {
         private readonly HttpClient _httpClient;
         private readonly ILogger<ReportIssueModel> _logger;
+        private readonly IConfiguration _configuration;
 
         public string? TitleError { get; set; }
         public string? DescriptionError { get; set; }
@@ -25,25 +25,31 @@ namespace Datwise.WebForms.Pages
         public string? GeneralError { get; set; }
         public string? SuccessMessage { get; set; }
 
-        public ReportIssueModel(HttpClient httpClient, ILogger<ReportIssueModel> logger)
+        public ReportIssueModel(HttpClient httpClient, ILogger<ReportIssueModel> logger, IConfiguration configuration)
         {
             _httpClient = httpClient;
             _logger = logger;
+            _configuration = configuration;
         }
 
         public async Task<IActionResult> OnPostAsync(
-            string title,
-            string description,
-            string severity,
-            string department,
-            string location,
-            string reportedBy)
+            [FromForm] string title,
+            [FromForm] string description,
+            [FromForm] string severity,
+            [FromForm] string department,
+            [FromForm] string location,
+            [FromForm] string reportedBy)
         {
+            _logger.LogInformation($"OnPostAsync called with Title: {title}, ReportedBy: {reportedBy}");
+
             // Form Validation
             bool isValid = ValidateForm(title, description, severity, department, location, reportedBy);
 
             if (!isValid)
+            {
+                _logger.LogWarning("Form validation failed");
                 return Page();
+            }
 
             try
             {
@@ -52,7 +58,7 @@ namespace Datwise.WebForms.Pages
                 {
                     title = title.Trim(),
                     description = description.Trim(),
-                    severity = severity,
+                    severity = severity.Trim(),
                     status = "Open",
                     reportedBy = reportedBy.Trim(),
                     department = department.Trim(),
@@ -63,28 +69,43 @@ namespace Datwise.WebForms.Pages
                 var jsonContent = JsonSerializer.Serialize(issue);
                 var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
+                _logger.LogInformation($"Sending request to API with payload: {jsonContent}");
+
                 // Call API endpoint
-                var apiUrl = HttpContext.RequestServices.GetRequiredService<IConfiguration>()["ApiBaseUrl"] ?? "https://localhost:53486";
-                var response = await _httpClient.PostAsync($"{apiUrl}/api/issues", content);
+                var apiUrl = _configuration["ApiBaseUrl"] ?? "https://localhost:53486";
+                var apiEndpoint = $"{apiUrl}/api/issues";
+                
+                _logger.LogInformation($"API Endpoint: {apiEndpoint}");
+
+                var response = await _httpClient.PostAsync(apiEndpoint, content);
+
+                _logger.LogInformation($"API Response Status: {response.StatusCode}");
 
                 if (response.IsSuccessStatusCode)
                 {
                     SuccessMessage = "Issue reported successfully! Thank you for your report.";
-                    _logger.LogInformation($"New issue reported: {title} by {reportedBy}");
-                    // Optionally redirect back to dashboard after a delay
+                    _logger.LogInformation($"New issue reported successfully: {title} by {reportedBy}");
+                    // Redirect back to dashboard
                     return Redirect("/");
                 }
                 else
                 {
-                    GeneralError = "Failed to submit the report. Please try again.";
-                    _logger.LogError($"API error: {response.StatusCode}");
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    _logger.LogError($"API error: {response.StatusCode} - {errorContent}");
+                    GeneralError = $"Failed to submit the report. API Error: {response.StatusCode}";
                     return Page();
                 }
             }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "HTTP Request error submitting report");
+                GeneralError = $"Failed to connect to the service. Please ensure the API is running. Error: {ex.Message}";
+                return Page();
+            }
             catch (Exception ex)
             {
-                GeneralError = "An error occurred while submitting the report. Please try again later.";
-                _logger.LogError(ex, "Error submitting report");
+                _logger.LogError(ex, "Unexpected error submitting report");
+                GeneralError = $"An unexpected error occurred: {ex.Message}";
                 return Page();
             }
         }

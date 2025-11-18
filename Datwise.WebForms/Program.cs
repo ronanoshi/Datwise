@@ -2,7 +2,9 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System.Net.Http;
+using Microsoft.Extensions.Configuration;
+using Datwise.WebForms.Pages;
+using System;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,9 +12,21 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
-// Configure HttpClient for API communication
+// Configure HttpClient for API communication with proper settings
+builder.Services.AddHttpClient<ReportIssueModel>(client =>
+{
+    var apiUrl = builder.Configuration["ApiBaseUrl"] ?? "https://localhost:53486";
+    client.BaseAddress = new Uri(apiUrl);
+    client.DefaultRequestHeaders.Add("Accept", "application/json");
+})
+.ConfigureHttpClient(client =>
+{
+    // Configure client behavior
+    client.Timeout = TimeSpan.FromSeconds(30);
+});
+
+// Also add general HttpClient for other pages
 builder.Services.AddHttpClient();
-builder.Services.AddScoped<HttpClient>();
 
 var app = builder.Build();
 
