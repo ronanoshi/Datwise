@@ -1,0 +1,25 @@
+{
+  "profiles": {
+    "New Profile": {
+      "commandName": "RunCommand",
+      "executables": {
+        "Datwise.WebForms": {
+          "commandName": "Project"
+        },
+        "Datwise.Api": {
+          "commandName": "Project"
+        }
+      }
+    },
+    "Datwise.WebForms": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "applicationUrl": "http://localhost:53485"
+    },
+    "Datwise.Api": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "applicationUrl": "https://localhost:53486;http://localhost:53487"
+    }
+  }
+}

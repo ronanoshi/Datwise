@@ -8,8 +8,11 @@
   <ItemGroup>
     <ProjectReference Include="..\\Datwise.Services\\Datwise.Services.csproj" />
     <ProjectReference Include="..\\Datwise.Contracts\\Datwise.Contracts.csproj" />
+    <ProjectReference Include="..\\Datwise.Data\\Datwise.Data.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.0" />
   </ItemGroup>
 </Project>
