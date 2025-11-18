@@ -13,25 +13,26 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
-// Configure HttpClient for API communication with proper settings
-builder.Services.AddHttpClient<ReportIssueModel>(client =>
+// Get API URL from configuration
+var apiBaseUrl = builder.Configuration["ApiBaseUrl"];
+Console.WriteLine($"[DEBUG] ApiBaseUrl from config: {apiBaseUrl}");
+
+if (string.IsNullOrEmpty(apiBaseUrl))
 {
-    var apiUrl = builder.Configuration["ApiBaseUrl"] ?? "https://localhost:53486";
-    
-    // In development, use HTTP instead of HTTPS to avoid certificate issues
-    if (builder.Environment.IsDevelopment())
+    apiBaseUrl = "http://localhost:53487";
+    Console.WriteLine($"[DEBUG] ApiBaseUrl was null, using default: {apiBaseUrl}");
+}
+
+// Configure HttpClient for API communication with explicit BaseAddress
+builder.Services.AddHttpClient<ReportIssueModel>()
+    .ConfigureHttpClient(client =>
     {
-        apiUrl = apiUrl.Replace("https://", "http://");
-    }
-    
-    client.BaseAddress = new Uri(apiUrl);
-    client.DefaultRequestHeaders.Add("Accept", "application/json");
-})
-.ConfigureHttpClient(client =>
-{
-    // Configure client behavior
-    client.Timeout = TimeSpan.FromSeconds(30);
-});
+        Console.WriteLine($"[DEBUG] Setting HttpClient BaseAddress to: {apiBaseUrl}");
+        client.BaseAddress = new Uri(apiBaseUrl);
+        client.DefaultRequestHeaders.Add("Accept", "application/json");
+        client.Timeout = TimeSpan.FromSeconds(30);
+        Console.WriteLine($"[DEBUG] HttpClient BaseAddress set to: {client.BaseAddress}");
+    });
 
 // Also add general HttpClient for other pages
 builder.Services.AddHttpClient();

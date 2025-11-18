@@ -46,7 +46,7 @@ public class IndexModel : PageModel
     {
         try
         {
-            var apiUrl = _configuration["ApiBaseUrl"] ?? "https://localhost:53486";
+            var apiUrl = _configuration["ApiBaseUrl"] ?? "http://localhost:53487";
             var response = await _httpClient.GetAsync($"{apiUrl}/api/issues/statistics/summary");
 
             if (response.IsSuccessStatusCode)
@@ -75,7 +75,7 @@ public class IndexModel : PageModel
     {
         try
         {
-            var apiUrl = _configuration["ApiBaseUrl"] ?? "https://localhost:53486";
+            var apiUrl = _configuration["ApiBaseUrl"] ?? "http://localhost:53487";
             var endpoint = $"{apiUrl}/api/issues/open";
             
             if (!string.IsNullOrWhiteSpace(sort))

@@ -30,6 +30,18 @@ namespace Datwise.WebForms.Pages
             _httpClient = httpClient;
             _logger = logger;
             _configuration = configuration;
+            
+            // Ensure BaseAddress is set
+            if (_httpClient.BaseAddress == null)
+            {
+                var apiBaseUrl = _configuration["ApiBaseUrl"] ?? "http://localhost:53487";
+                _logger.LogWarning($"HttpClient BaseAddress was null! Setting it to: {apiBaseUrl}");
+                _httpClient.BaseAddress = new Uri(apiBaseUrl);
+            }
+            else
+            {
+                _logger.LogInformation($"HttpClient BaseAddress is already set to: {_httpClient.BaseAddress}");
+            }
         }
 
         public async Task<IActionResult> OnPostAsync(
@@ -71,20 +83,8 @@ namespace Datwise.WebForms.Pages
 
                 _logger.LogInformation($"Sending request to API with payload: {jsonContent}");
 
-                // Call API endpoint
-                var apiBaseUrl = _configuration["ApiBaseUrl"] ?? "https://localhost:53486";
-                
-                // Convert HTTPS to HTTP for development
-                if (apiBaseUrl.StartsWith("https://localhost"))
-                {
-                    apiBaseUrl = apiBaseUrl.Replace("https://", "http://");
-                }
-                
-                var apiEndpoint = $"{apiBaseUrl}/api/issues";
-                
-                _logger.LogInformation($"API Endpoint: {apiEndpoint}");
-
-                var response = await _httpClient.PostAsync(apiEndpoint, content);
+                // Call API endpoint - use relative path since HttpClient has BaseAddress configured
+                var response = await _httpClient.PostAsync("/api/issues", content);
 
                 _logger.LogInformation($"API Response Status: {response.StatusCode}");
 
@@ -106,7 +106,7 @@ namespace Datwise.WebForms.Pages
             catch (HttpRequestException ex)
             {
                 _logger.LogError(ex, "HTTP Request error submitting report");
-                GeneralError = $"Failed to connect to the service. Please ensure the API is running on http://localhost:53487. Error: {ex.Message}";
+                GeneralError = $"Failed to connect to the service. Please ensure the API is running. Error: {ex.Message}";
                 return Page();
             }
             catch (Exception ex)

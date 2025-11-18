@@ -11,6 +11,8 @@
         </div>
         <div class="modal-body">
             <form id="reportForm" method="post">
+                @Html.AntiForgeryToken()
+                
                 <div class="mb-3">
                     <label for="title" class="form-label">Issue Title *</label>
                     <input type="text" class="form-control @(!string.IsNullOrEmpty(Model?.TitleError) ? "is-invalid" : "")" 
