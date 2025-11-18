@@ -76,11 +76,11 @@ public class IndexModel : PageModel
         try
         {
             var apiUrl = _configuration["ApiBaseUrl"] ?? "http://localhost:53487";
-            var endpoint = $"{apiUrl}/api/issues/open";
+            var endpoint = $"{apiUrl}/api/issues?status=Open,In Progress";
             
             if (!string.IsNullOrWhiteSpace(sort))
             {
-                endpoint += $"?sort={Uri.EscapeDataString(sort)}";
+                endpoint += $"&sort={Uri.EscapeDataString(sort)}";
             }
 
             var response = await _httpClient.GetAsync(endpoint);

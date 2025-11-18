@@ -50,58 +50,6 @@ namespace Datwise.Api.Controllers
         }
 
         /// <summary>
-        /// Get all open issues (Open or In Progress status)
-        /// </summary>
-        [HttpGet("open")]
-        public async Task<ActionResult<IEnumerable<Issue>>> GetOpenIssues([FromQuery] string? sort)
-        {
-            try
-            {
-                var sortDescending = false;
-                var sortBy = sort;
-                if (!string.IsNullOrWhiteSpace(sort) && sort.StartsWith('-'))
-                {
-                    sortBy = sort.Substring(1);
-                    sortDescending = true;
-                }
-
-                var issues = await _issueService.GetIssuesAsync(status: "Open", sortBy: sortBy, sortDescending: sortDescending);
-                return Ok(issues);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error retrieving open issues");
-                return StatusCode(500, new { message = "An error occurred while retrieving issues" });
-            }
-        }
-
-        /// <summary>
-        /// Get issues by severity level
-        /// </summary>
-        [HttpGet("severity/{severity}")]
-        public async Task<ActionResult<IEnumerable<Issue>>> GetIssuesBySeverity(string severity, [FromQuery] string? sort)
-        {
-            try
-            {
-                var sortDescending = false;
-                var sortBy = sort;
-                if (!string.IsNullOrWhiteSpace(sort) && sort.StartsWith('-'))
-                {
-                    sortBy = sort.Substring(1);
-                    sortDescending = true;
-                }
-
-                var issues = await _issueService.GetIssuesAsync(severity: severity, sortBy: sortBy, sortDescending: sortDescending);
-                return Ok(issues);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error retrieving issues by severity");
-                return StatusCode(500, new { message = "An error occurred while retrieving issues" });
-            }
-        }
-
-        /// <summary>
         /// Get issue by ID
         /// </summary>
         [HttpGet("{id}")]

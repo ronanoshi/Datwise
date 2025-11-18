@@ -263,6 +263,26 @@ namespace Datwise.Tests
         }
 
         [Fact]
+        public async Task GetOpenIssuesAsync_EquivalentToGetIssuesWithOpenInProgressFilter()
+        {
+            // Arrange
+            var context = GetDbContext();
+            var issues = GetSampleIssues();
+            issues.Add(new Issue { Id = 4, Title = "Resolved Issue", Status = "Resolved", Severity = "Low", ReportedBy = "Test" });
+            context.Issues.AddRange(issues);
+            await context.SaveChangesAsync();
+            var repository = new IssueRepository(context);
+
+            // Act - GetOpenIssuesAsync should return same as GetIssuesAsync with Open,In Progress filter
+            var openIssues = await repository.GetOpenIssuesAsync();
+            var filteredIssues = await repository.GetIssuesAsync(status: "Open,In Progress");
+
+            // Assert
+            Assert.Equal(openIssues.Count(), filteredIssues.Count());
+            Assert.All(openIssues, issue => Assert.True(issue.Status == "Open" || issue.Status == "In Progress"));
+        }
+
+        [Fact]
         public async Task GetIssuesAsync_WithMultipleSeverities_ReturnsFilteredIssues()
         {
             // Arrange
