@@ -1,0 +1,3 @@
+- Follow plan: Scaffold WebForms + WebAPI solution.
+- Keep instructions short and explicit.
+- Use Visual Studio to build and run WebForms.

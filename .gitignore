@@ -1,0 +1,23 @@
+# VS
+.vs/
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Build results
+bin/**
+obj/**
+
+# NuGet
+packages/
+*.nupkg
+.nuget/
+
+# Rider
+.idea/
+
+# Others
+*.log

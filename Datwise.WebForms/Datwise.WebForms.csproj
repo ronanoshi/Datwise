@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <AspNetMvcVersion>5.2.7</AspNetMvcVersion>
+    <RootNamespace>Datwise.WebForms</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Datwise.Contracts\Datwise.Contracts.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>net48;netstandard2.0;net8.0</TargetFrameworks>
+    <RootNamespace>Datwise.Services</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Datwise.Contracts\Datwise.Contracts.csproj" />
+    <ProjectReference Include="..\Datwise.Models\Datwise.Models.csproj" />
+  </ItemGroup>
+</Project>
