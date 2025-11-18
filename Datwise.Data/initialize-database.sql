@@ -1,12 +1,6 @@
 -- Datwise Security & Safety Control Panel - SQLite Database Schema
 -- This script creates the database schema for SQLite
 
--- Create Examples table (for existing example functionality)
-CREATE TABLE IF NOT EXISTS Examples (
-    Id INTEGER PRIMARY KEY AUTOINCREMENT,
-    Name TEXT
-);
-
 -- Create Issues table for security and safety incident tracking
 CREATE TABLE IF NOT EXISTS Issues (
     Id INTEGER PRIMARY KEY AUTOINCREMENT,

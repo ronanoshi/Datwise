@@ -8,7 +8,6 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the DI container
 builder.Services.AddControllers();
 builder.Services.AddSwaggerGen();
-builder.Services.AddScoped<IExampleService, ExampleService>();
 builder.Services.AddScoped<IIssueRepository, IssueRepository>();
 builder.Services.AddScoped<IIssueService, IssueService>();
 

@@ -7,7 +7,6 @@ namespace Datwise.Data
     {
         public DatwiseDbContext(DbContextOptions<DatwiseDbContext> options) : base(options) { }
 
-        public DbSet<ExampleModel> Examples { get; set; } = null!;
         public DbSet<Issue> Issues { get; set; } = null!;
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
