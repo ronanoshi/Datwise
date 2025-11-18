@@ -1,7 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using Datwise.Services;
 using Datwise.Models;
 using Datwise.Contracts;

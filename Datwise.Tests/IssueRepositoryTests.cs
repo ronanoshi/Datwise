@@ -4,9 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
 using Datwise.Models;
-using Datwise.Services;
 using Datwise.Data;
-using Datwise.Contracts;
 using Microsoft.EntityFrameworkCore;
 
 namespace Datwise.Tests
@@ -300,6 +298,117 @@ namespace Datwise.Tests
             Assert.Equal(2, result.Count());
             Assert.All(result, issue => Assert.True((issue.Status == "Open" || issue.Status == "In Progress") && 
                                                      (issue.Severity == "High" || issue.Severity == "Critical")));
+        }
+
+        [Fact]
+        public async Task GetIssuesAsync_SortByAllFields_WorksCorrectly()
+        {
+            // Arrange
+            var context = GetDbContext();
+            var issues = GetSampleIssues();
+            context.Issues.AddRange(issues);
+            await context.SaveChangesAsync();
+            var repository = new IssueRepository(context);
+
+            // Act & Assert - Test each sortable field
+            var sortFields = new[] { "id", "title", "severity", "status", "department", "location", "reportedby", "date", "reporteddate" };
+            foreach (var field in sortFields)
+            {
+                var result = await repository.GetIssuesAsync(sortBy: field);
+                Assert.NotEmpty(result);
+                
+                var resultDesc = await repository.GetIssuesAsync(sortBy: $"-{field}");
+                Assert.NotEmpty(resultDesc);
+            }
+        }
+
+        [Fact]
+        public async Task GetIssueByIdAsync_WithValidId_ReturnsIssue()
+        {
+            // Arrange
+            var context = GetDbContext();
+            var issue = new Issue
+            {
+                Id = 1,
+                Title = "Test Issue",
+                Description = "Test",
+                Severity = "High",
+                Status = "Open",
+                ReportedBy = "Test",
+                Department = "Test",
+                Location = "Test"
+            };
+            context.Issues.Add(issue);
+            await context.SaveChangesAsync();
+            var repository = new IssueRepository(context);
+
+            // Act
+            var result = await repository.GetIssueByIdAsync(1);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal("Test Issue", result.Title);
+        }
+
+        [Fact]
+        public async Task GetIssueByIdAsync_WithInvalidId_ReturnsNull()
+        {
+            // Arrange
+            var context = GetDbContext();
+            var repository = new IssueRepository(context);
+
+            // Act
+            var result = await repository.GetIssueByIdAsync(999);
+
+            // Assert
+            Assert.Null(result);
+        }
+
+        [Fact]
+        public async Task CreateIssueAsync_SetsReportedDateToUtcNow()
+        {
+            // Arrange
+            var context = GetDbContext();
+            var repository = new IssueRepository(context);
+            var beforeCreation = DateTime.UtcNow;
+            var newIssue = new Issue
+            {
+                Title = "New Issue",
+                Description = "Test",
+                Severity = "High",
+                Status = "Open",
+                ReportedBy = "Test",
+                Department = "Test",
+                Location = "Test"
+            };
+
+            // Act
+            var id = await repository.CreateIssueAsync(newIssue);
+            var savedIssue = await repository.GetIssueByIdAsync(id);
+
+            // Assert
+            Assert.NotNull(savedIssue);
+            Assert.True(savedIssue.ReportedDate >= beforeCreation);
+            Assert.True(savedIssue.ReportedDate <= DateTime.UtcNow);
+        }
+
+        [Fact]
+        public async Task GetAllIssuesAsync_ReturnsAllIssuesOrderedByDate()
+        {
+            // Arrange
+            var context = GetDbContext();
+            var issues = GetSampleIssues();
+            context.Issues.AddRange(issues);
+            await context.SaveChangesAsync();
+            var repository = new IssueRepository(context);
+
+            // Act
+            var result = await repository.GetAllIssuesAsync();
+
+            // Assert
+            Assert.Equal(3, result.Count());
+            var list = result.ToList();
+            Assert.True(list[0].ReportedDate >= list[1].ReportedDate);
         }
     }
 }

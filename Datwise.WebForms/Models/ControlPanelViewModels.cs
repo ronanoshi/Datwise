@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 
 // This file is kept for backwards compatibility
 // All view models have been split into their own files

@@ -2,10 +2,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Configuration;
 using Datwise.WebForms.Pages;
 using System;
-using System.Net.Http;
 
 var builder = WebApplication.CreateBuilder(args);
 

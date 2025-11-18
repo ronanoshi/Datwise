@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using Datwise.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace Datwise.Data
 {

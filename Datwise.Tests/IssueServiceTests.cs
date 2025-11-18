@@ -265,5 +265,113 @@ namespace Datwise.Tests
             Assert.Equal(5, result.TotalOpenIssues);
             Assert.Equal(1, result.CriticalIssuesCount);
         }
+
+        [Fact]
+        public async Task GetIssuesAsync_WithEmptyFilters_CallsRepositoryWithNullValues()
+        {
+            // Arrange
+            var mockRepo = GetMockRepository();
+            var issues = GetSampleIssues();
+            mockRepo.Setup(r => r.GetIssuesAsync(null, null, null, false)).ReturnsAsync(issues);
+            var service = new IssueService(mockRepo.Object);
+
+            // Act
+            var result = await service.GetIssuesAsync(null, null, null, false);
+
+            // Assert
+            Assert.Equal(2, result.Count());
+            mockRepo.Verify(r => r.GetIssuesAsync(null, null, null, false), Times.Once);
+        }
+
+        [Fact]
+        public async Task GetIssueByIdAsync_CallsRepository()
+        {
+            // Arrange
+            var mockRepo = GetMockRepository();
+            var issue = GetSampleIssues().First();
+            mockRepo.Setup(r => r.GetIssueByIdAsync(1)).ReturnsAsync(issue);
+            var service = new IssueService(mockRepo.Object);
+
+            // Act
+            var result = await service.GetIssueByIdAsync(1);
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(issue.Id, result.Id);
+            mockRepo.Verify(r => r.GetIssueByIdAsync(1), Times.Once);
+        }
+
+        [Fact]
+        public async Task UpdateIssueAsync_CallsRepository()
+        {
+            // Arrange
+            var mockRepo = GetMockRepository();
+            mockRepo.Setup(r => r.UpdateIssueAsync(It.IsAny<Issue>())).ReturnsAsync(true);
+            var service = new IssueService(mockRepo.Object);
+            var issue = new Issue { Id = 1, Title = "Updated", Severity = "High", Status = "Open", ReportedBy = "User", Description = "Desc" };
+
+            // Act
+            var result = await service.UpdateIssueAsync(issue);
+
+            // Assert
+            Assert.True(result);
+            mockRepo.Verify(r => r.UpdateIssueAsync(issue), Times.Once);
+        }
+
+        [Fact]
+        public async Task DeleteIssueAsync_WithValidId_CallsRepository()
+        {
+            // Arrange
+            var mockRepo = GetMockRepository();
+            mockRepo.Setup(r => r.DeleteIssueAsync(5)).ReturnsAsync(true);
+            var service = new IssueService(mockRepo.Object);
+
+            // Act
+            var result = await service.DeleteIssueAsync(5);
+
+            // Assert
+            Assert.True(result);
+            mockRepo.Verify(r => r.DeleteIssueAsync(5), Times.Once);
+        }
+
+        [Fact]
+        public async Task CreateIssueAsync_ValidatesAllRequiredFields()
+        {
+            // Arrange
+            var mockRepo = GetMockRepository();
+            var service = new IssueService(mockRepo.Object);
+
+            // Act & Assert - Title validation
+            await Assert.ThrowsAsync<ArgumentException>(() => service.CreateIssueAsync(
+                new Issue { Title = "  ", Description = "Desc", ReportedBy = "User", Severity = "High", Status = "Open", Department = "Dept", Location = "Loc" }
+            ));
+
+            // Act & Assert - Description validation
+            await Assert.ThrowsAsync<ArgumentException>(() => service.CreateIssueAsync(
+                new Issue { Title = "Title", Description = "  ", ReportedBy = "User", Severity = "High", Status = "Open", Department = "Dept", Location = "Loc" }
+            ));
+
+            // Act & Assert - ReportedBy validation
+            await Assert.ThrowsAsync<ArgumentException>(() => service.CreateIssueAsync(
+                new Issue { Title = "Title", Description = "Desc", ReportedBy = "  ", Severity = "High", Status = "Open", Department = "Dept", Location = "Loc" }
+            ));
+        }
+
+        [Fact]
+        public async Task GetIssuesAsync_WithMultipleStatusesAndSeverities_CallsRepositoryCorrectly()
+        {
+            // Arrange
+            var mockRepo = GetMockRepository();
+            var issues = GetSampleIssues();
+            mockRepo.Setup(r => r.GetIssuesAsync("Open,In Progress", "High,Critical", "date", true)).ReturnsAsync(issues);
+            var service = new IssueService(mockRepo.Object);
+
+            // Act
+            var result = await service.GetIssuesAsync("Open,In Progress", "High,Critical", "date", true);
+
+            // Assert
+            Assert.Equal(2, result.Count());
+            mockRepo.Verify(r => r.GetIssuesAsync("Open,In Progress", "High,Critical", "date", true), Times.Once);
+        }
     }
 }
