@@ -13,5 +13,8 @@ namespace Datwise.WebForms.Models
         public string ReportedBy { get; set; } = string.Empty;
         public string Department { get; set; } = string.Empty;
         public string Location { get; set; } = string.Empty;
+        public DateTime? ResolvedDate { get; set; }
+        public string? ResolvedBy { get; set; }
+        public string? ResolutionNotes { get; set; }
     }
 }

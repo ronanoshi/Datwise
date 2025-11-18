@@ -1,0 +1,157 @@
+@page "/IssueDetail/{id}"
+@using Datwise.WebForms.Models
+@using Datwise.WebForms.Pages
+@model Datwise.WebForms.Pages.IssueDetailModel
+@{
+    ViewData["Title"] = "Issue Details";
+}
+
+<div class="container-fluid mt-4">
+    <div class="row">
+        <div class="col-lg-8">
+            @if (!string.IsNullOrEmpty(Model?.ErrorMessage))
+            {
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="bi bi-exclamation-circle"></i> @Model.ErrorMessage
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+                <div class="text-center mt-4">
+                    <a href="/" class="btn btn-secondary">Back to Dashboard</a>
+                </div>
+            }
+            else if (Model?.Issue != null)
+            {
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0">Issue #@Model.Issue.Id: @Model.Issue.Title</h4>
+                    </div>
+                    <div class="card-body">
+                        <!-- Status & Severity Row -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Status</label>
+                                <div>
+                                    @switch (Model.Issue.Status)
+                                    {
+                                        case "Open":
+                                            <span class="badge bg-danger">Open</span>
+                                            break;
+                                        case "In Progress":
+                                            <span class="badge bg-warning text-dark">In Progress</span>
+                                            break;
+                                        case "Resolved":
+                                            <span class="badge bg-success">Resolved</span>
+                                            break;
+                                        default:
+                                            <span class="badge bg-secondary">@Model.Issue.Status</span>
+                                            break;
+                                    }
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Severity</label>
+                                <div>
+                                    @switch (Model.Issue.Severity)
+                                    {
+                                        case "Critical":
+                                            <span class="badge bg-danger">Critical</span>
+                                            break;
+                                        case "High":
+                                            <span class="badge bg-orange" style="background-color: #fd7e14;">High</span>
+                                            break;
+                                        case "Medium":
+                                            <span class="badge bg-info">Medium</span>
+                                            break;
+                                        case "Low":
+                                            <span class="badge bg-success">Low</span>
+                                            break;
+                                        default:
+                                            <span class="badge bg-secondary">@Model.Issue.Severity</span>
+                                            break;
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Description</label>
+                            <div class="p-3 bg-light rounded">
+                                @Model.Issue.Description
+                            </div>
+                        </div>
+
+                        <!-- Details Row 1 -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Department</label>
+                                <p>@Model.Issue.Department</p>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Location</label>
+                                <p>@Model.Issue.Location</p>
+                            </div>
+                        </div>
+
+                        <!-- Details Row 2 -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Reported By</label>
+                                <p>@Model.Issue.ReportedBy</p>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Reported Date</label>
+                                <p>@Model.Issue.ReportedDate.ToString("yyyy-MM-dd HH:mm:ss")</p>
+                            </div>
+                        </div>
+
+                        <!-- Resolution Section (if resolved) -->
+                        @if (!string.IsNullOrEmpty(Model.Issue.ResolvedBy))
+                        {
+                            <hr />
+                            <h5>Resolution Details</h5>
+                            <div class="row mb-4">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Resolved By</label>
+                                    <p>@Model.Issue.ResolvedBy</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold">Resolved Date</label>
+                                    <p>
+                                        @if (Model.Issue.ResolvedDate.HasValue)
+                                        {
+                                            @Model.Issue.ResolvedDate.Value.ToString("yyyy-MM-dd HH:mm:ss")
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">Not set</span>
+                                        }
+                                    </p>
+                                </div>
+                            </div>
+
+                            @if (!string.IsNullOrEmpty(Model.Issue.ResolutionNotes))
+                            {
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">Resolution Notes</label>
+                                    <div class="p-3 bg-light rounded">
+                                        @Model.Issue.ResolutionNotes
+                                    </div>
+                                </div>
+                            }
+                        }
+                    </div>
+                    <div class="card-footer">
+                        <a href="/" class="btn btn-secondary">Back to Dashboard</a>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info">
+                    Loading issue details...
+                </div>
+            }
+        </div>
+    </div>
+</div>
