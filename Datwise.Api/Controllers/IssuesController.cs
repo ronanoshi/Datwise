@@ -23,9 +23,10 @@ namespace Datwise.Api.Controllers
 
         /// <summary>
         /// Get issues with optional filtering and sorting
+        /// Supports multiple values for status and severity (comma-separated)
         /// </summary>
-        /// <param name="status">Filter by status (Open, In Progress, Resolved)</param>
-        /// <param name="severity">Filter by severity (Low, Medium, High, Critical)</param>
+        /// <param name="status">Filter by status (comma-separated: Open, In Progress, Resolved)</param>
+        /// <param name="severity">Filter by severity (comma-separated: Low, Medium, High, Critical)</param>
         /// <param name="sort">Sort field: id, title, severity, status, department, location, reportedby, date (prefix with - for descending)</param>
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Issue>>> GetIssues([FromQuery] string? status, [FromQuery] string? severity, [FromQuery] string? sort)

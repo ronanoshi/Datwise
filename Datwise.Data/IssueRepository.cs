@@ -19,7 +19,15 @@ namespace Datwise.Data
 
         public async Task<IEnumerable<Issue>> GetOpenIssuesAsync()
         {
-            return await GetIssuesAsync(status: "Open");
+            // Return issues with Open or In Progress status
+            var query = _context.Issues.AsQueryable();
+            query = query.Where(i => i.Status == "Open" || i.Status == "In Progress");
+            
+            // Apply default sorting: by severity priority, then by date
+            query = query.OrderByDescending(i => i.Severity == "Critical" ? 0 : i.Severity == "High" ? 1 : i.Severity == "Medium" ? 2 : 3)
+                         .ThenByDescending(i => i.ReportedDate);
+            
+            return await query.ToListAsync();
         }
 
         public async Task<IEnumerable<Issue>> GetIssuesBySeverityAsync(string severity)
@@ -48,15 +56,32 @@ namespace Datwise.Data
         {
             var query = _context.Issues.AsQueryable();
 
-            // Apply filters
+            // Apply status filter - supports comma-separated values
             if (!string.IsNullOrWhiteSpace(status))
             {
-                query = query.Where(i => i.Status == status);
+                var statuses = status.Split(',')
+                    .Select(s => s.Trim())
+                    .Where(s => !string.IsNullOrWhiteSpace(s))
+                    .ToList();
+
+                if (statuses.Any())
+                {
+                    query = query.Where(i => statuses.Contains(i.Status));
+                }
             }
 
+            // Apply severity filter - supports comma-separated values
             if (!string.IsNullOrWhiteSpace(severity))
             {
-                query = query.Where(i => i.Severity == severity);
+                var severities = severity.Split(',')
+                    .Select(s => s.Trim())
+                    .Where(s => !string.IsNullOrWhiteSpace(s))
+                    .ToList();
+
+                if (severities.Any())
+                {
+                    query = query.Where(i => severities.Contains(i.Severity));
+                }
             }
 
             // Apply sorting

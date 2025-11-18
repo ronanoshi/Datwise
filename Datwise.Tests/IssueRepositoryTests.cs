@@ -244,5 +244,62 @@ namespace Datwise.Tests
             Assert.Equal(1, stats.CriticalIssuesCount);
             Assert.Equal(1, stats.HighSeverityCount);
         }
+
+        [Fact]
+        public async Task GetIssuesAsync_WithMultipleStatuses_ReturnsFilteredIssues()
+        {
+            // Arrange
+            var context = GetDbContext();
+            var issues = GetSampleIssues();
+            issues.Add(new Issue { Id = 4, Title = "Resolved Issue", Status = "Resolved", Severity = "Low", ReportedBy = "Test" });
+            context.Issues.AddRange(issues);
+            await context.SaveChangesAsync();
+            var repository = new IssueRepository(context);
+
+            // Act
+            var result = await repository.GetIssuesAsync(status: "Open,In Progress");
+
+            // Assert
+            Assert.Equal(3, result.Count());
+            Assert.All(result, issue => Assert.True(issue.Status == "Open" || issue.Status == "In Progress"));
+        }
+
+        [Fact]
+        public async Task GetIssuesAsync_WithMultipleSeverities_ReturnsFilteredIssues()
+        {
+            // Arrange
+            var context = GetDbContext();
+            var issues = GetSampleIssues();
+            context.Issues.AddRange(issues);
+            await context.SaveChangesAsync();
+            var repository = new IssueRepository(context);
+
+            // Act
+            var result = await repository.GetIssuesAsync(severity: "High,Critical");
+
+            // Assert
+            Assert.Equal(2, result.Count());
+            Assert.All(result, issue => Assert.True(issue.Severity == "High" || issue.Severity == "Critical"));
+        }
+
+        [Fact]
+        public async Task GetIssuesAsync_WithMultipleStatusesAndSeverities_ReturnsFilteredIssues()
+        {
+            // Arrange
+            var context = GetDbContext();
+            var issues = GetSampleIssues();
+            issues.Add(new Issue { Id = 4, Title = "Low Resolved", Status = "Resolved", Severity = "Low", ReportedBy = "Test" });
+            context.Issues.AddRange(issues);
+            await context.SaveChangesAsync();
+            var repository = new IssueRepository(context);
+
+            // Act
+            var result = await repository.GetIssuesAsync(status: "Open,In Progress", severity: "High,Critical");
+
+            // Assert
+            Assert.Equal(2, result.Count());
+            Assert.All(result, issue => Assert.True((issue.Status == "Open" || issue.Status == "In Progress") && 
+                                                     (issue.Severity == "High" || issue.Severity == "Critical")));
+        }
     }
 }
