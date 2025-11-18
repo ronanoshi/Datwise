@@ -5,6 +5,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
 using Datwise.WebForms.Pages;
 using System;
+using System.Net.Http;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,6 +17,13 @@ builder.Services.AddRazorPages();
 builder.Services.AddHttpClient<ReportIssueModel>(client =>
 {
     var apiUrl = builder.Configuration["ApiBaseUrl"] ?? "https://localhost:53486";
+    
+    // In development, use HTTP instead of HTTPS to avoid certificate issues
+    if (builder.Environment.IsDevelopment())
+    {
+        apiUrl = apiUrl.Replace("https://", "http://");
+    }
+    
     client.BaseAddress = new Uri(apiUrl);
     client.DefaultRequestHeaders.Add("Accept", "application/json");
 })

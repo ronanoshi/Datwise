@@ -72,8 +72,15 @@ namespace Datwise.WebForms.Pages
                 _logger.LogInformation($"Sending request to API with payload: {jsonContent}");
 
                 // Call API endpoint
-                var apiUrl = _configuration["ApiBaseUrl"] ?? "https://localhost:53486";
-                var apiEndpoint = $"{apiUrl}/api/issues";
+                var apiBaseUrl = _configuration["ApiBaseUrl"] ?? "https://localhost:53486";
+                
+                // Convert HTTPS to HTTP for development
+                if (apiBaseUrl.StartsWith("https://localhost"))
+                {
+                    apiBaseUrl = apiBaseUrl.Replace("https://", "http://");
+                }
+                
+                var apiEndpoint = $"{apiBaseUrl}/api/issues";
                 
                 _logger.LogInformation($"API Endpoint: {apiEndpoint}");
 
@@ -99,7 +106,7 @@ namespace Datwise.WebForms.Pages
             catch (HttpRequestException ex)
             {
                 _logger.LogError(ex, "HTTP Request error submitting report");
-                GeneralError = $"Failed to connect to the service. Please ensure the API is running. Error: {ex.Message}";
+                GeneralError = $"Failed to connect to the service. Please ensure the API is running on http://localhost:53487. Error: {ex.Message}";
                 return Page();
             }
             catch (Exception ex)
